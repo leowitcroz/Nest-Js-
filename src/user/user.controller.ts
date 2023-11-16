@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put } from '@nestjs/common';
 
 @Controller('users')
 export class UserController {
@@ -9,13 +9,31 @@ export class UserController {
 
   @Get()
   async readAll() {
-    return { users:[{}]};
+    return { users: [{}] };
   }
 
   @Get(':id')
-  async readOne(@Param() params){
-    return { user:{}, params}
+  async readOne(@Param() params) {
+    return { user: {}, params };
+  }
+
+  @Put(':id')
+  async updateAll(@Body() body, @Param() params) {
+    return {
+      method: 'put',
+      body,
+      params,
+    };
+  }
+
+  @Patch(':id')
+  async updateParcial(@Body() body, @Param() params) {
+    return {
+      method: 'patch',
+      body,
+      params,
+    };
   }
 }
 
-// o @Param pega os paremetros da url
+// o @Param pega os paremetros da url como o id
