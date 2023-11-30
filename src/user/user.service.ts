@@ -31,8 +31,9 @@ export class UserSerivce {
   }
 
   async update(
-    id: number,
     { email, name, password, birthAt }: UpdatePutUserDTO,
+
+    id: number,
   ) {
     return this.prisma.user.update({
       data: {
