@@ -47,7 +47,27 @@ export class UserSerivce {
     });
   }
 
-  async updateParcial(id: number, data: UpdatePatchUserDTO) {
+  async updateParcial(
+    id: number,
+    { email, name, password, birthAt }: UpdatePatchUserDTO,
+  ) {
+    const data: any = {};
+
+    if (birthAt) {
+      data.birthAt = new Date(birthAt);
+    }
+    if (name) {
+      data.name = name;
+    }
+
+    if (password) {
+      data.password = password;
+    }
+
+    if (email) {
+      data.email = email;
+    }
+
     return this.prisma.user.update({
       data,
       where: {
