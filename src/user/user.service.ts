@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create_user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatePutUserDTO } from './dto/update_put_user.dto';
@@ -35,6 +35,8 @@ export class UserSerivce {
 
     id: number,
   ) {
+    await this.exist(id);
+
     return this.prisma.user.update({
       data: {
         email,
@@ -52,6 +54,7 @@ export class UserSerivce {
     id: number,
     { email, name, password, birthAt }: UpdatePatchUserDTO,
   ) {
+    await this.exist(id);
     const data: any = {};
 
     if (birthAt) {
@@ -75,5 +78,23 @@ export class UserSerivce {
         id,
       },
     });
+  }
+
+  async delete(id: number) {
+    await this.exist(id);
+
+    return this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async exist(id: number) {
+    if (!(await this.show(id))) {
+      throw new NotFoundException(
+        `The user with the following id ${id} don't exist`,
+      );
+    }
   }
 }
