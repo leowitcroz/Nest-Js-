@@ -28,12 +28,13 @@ export class UserController {
 
   @Get()
   async readAll() {
-    return { users: [{}] };
+    return this.userService.list()
+    
   }
 
   @Get(':id')
-  async readOne(@Param('id', ParseIntPipe) id) {
-    return { user: {}, id };
+  async readOne(@Param('id', ParseIntPipe) id:number) {
+    return this,this.userService.show(id)
   }
 
   @Put(':id')
