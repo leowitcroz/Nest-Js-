@@ -15,8 +15,8 @@ export class AuthController {
     ) { }
 
     @Post('login')
-    async login(@Body() {email,password}: AuthLoginDto) { 
-        return this.authService.login(email,password)
+    async login(@Body() { email, password }: AuthLoginDto) {
+        return this.authService.login(email, password)
     }
 
     @Post('register')
@@ -30,7 +30,12 @@ export class AuthController {
     }
 
     @Post('reset')
-    async reset(@Body() {password,token}: AuthResetDto) { 
-        return this.authService.reset(password,token)
+    async reset(@Body() { password, token }: AuthResetDto) {
+        return this.authService.reset(password, token)
+    }
+
+    @Post('me')
+    async me(@Body() body) {
+        return this.authService.checkToken(body.token)
     }
 }

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,11 +7,16 @@ import { UserSerivce } from 'src/user/user.service';
 
 @Injectable()
 export class AuthService {
+
+  private issuer = "login";
+  private audience = 'users';
+
   constructor(
     private readonly JWTService: JwtService,
     private readonly prisma: PrismaService,
     private readonly userService: UserSerivce,
-  ) {}
+  ) { }
+
 
   async createToken(user: User) {
     return {
@@ -19,17 +24,39 @@ export class AuthService {
         name: user.name,
         email: user.email,
       },
-      {
-        expiresIn: "7 days",
-        subject: String(user.id),
-        issuer: "login",
-        audience: 'Users'
-      })
+        {
+          expiresIn: "10 seconds",
+          subject: String(user.id),
+          issuer: this.issuer,
+          audience: this.audience,
+        })
     }
   }
 
   async checkToken(token: string) {
-    // retunr this.JWTService.verify()
+
+    try {
+      const data = this.JWTService.verify(token, {
+        audience: this.audience,
+        issuer: this.issuer,
+
+      });
+      return data
+    }
+    catch (e) {
+      throw new BadRequestException(e)
+    }
+
+  }
+
+  async isValidToken(token: string) {
+    try {
+      this.checkToken(token);
+      return true
+    }
+    catch (e) {
+      return false
+    }
   }
 
   async login(email: string, password: string) {
@@ -68,7 +95,7 @@ export class AuthService {
 
     const id = 0;
 
-   const user =  await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: {
         id,
       },
@@ -80,9 +107,9 @@ export class AuthService {
     return this.createToken(user);
   }
 
-  async register(data: AuthRegisterDto){
+  async register(data: AuthRegisterDto) {
 
     const user = await this.userService.create(data)
-    return this,this.createToken(user)
+    return this, this.createToken(user)
   }
 }
